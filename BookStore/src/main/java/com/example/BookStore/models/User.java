@@ -27,6 +27,7 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+    //password
 
     @Column(nullable = false)
     private String role = "USER"; // Default role
