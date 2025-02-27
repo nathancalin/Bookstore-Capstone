@@ -3,6 +3,7 @@ package com.example.BookStore.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
@@ -27,14 +28,15 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-    //password
 
     @Column(nullable = false)
     private String role = "USER"; // Ensure this stores "USER" or "ADMIN"
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    //@JsonIgnore
     private ShoppingCart shoppingCart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    //@JsonIgnore
     private List<Order> orders;
 }

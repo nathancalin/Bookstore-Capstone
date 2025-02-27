@@ -27,4 +27,9 @@ public class BookService {
     public void deleteBook(int id) {
         bookRepository.deleteById(id);
     }
+
+    public List<Book> getBooksByCategory(int categoryId) {
+        return bookRepository.findByCategoryId(categoryId);
+    }
+
 }

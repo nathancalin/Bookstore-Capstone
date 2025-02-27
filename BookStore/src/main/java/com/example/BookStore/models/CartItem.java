@@ -2,6 +2,8 @@ package com.example.BookStore.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Data
@@ -14,6 +16,7 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
+    @JsonIgnore
     private ShoppingCart shoppingCart;
 
     @ManyToOne

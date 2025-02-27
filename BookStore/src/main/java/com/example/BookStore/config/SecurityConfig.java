@@ -27,10 +27,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Allow public access
-                        .requestMatchers(HttpMethod.GET, "/books/**").permitAll() // Allow anyone to view books
-                        .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN") // Restrict book creation to ADMIN
-                        .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN") // Restrict book deletion to ADMIN
+                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Public access
+                        .requestMatchers(HttpMethod.GET, "/books/**").permitAll() // Anyone can view books
+                        .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN") // Only admin can create books
+                        .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN") // Only admin can delete books
+
+                        // Allow authenticated users to access shopping cart and cart items
+                        .requestMatchers("/cart/**", "/cart-items/**").hasRole("USER")
+
                         .anyRequest().authenticated() // Everything else needs authentication
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -38,6 +42,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

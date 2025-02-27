@@ -14,23 +14,13 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
 
-    @GetMapping
-    public List<ShoppingCart> getAllShoppingCarts() {
-        return shoppingCartService.getAllShoppingCarts();
+    @GetMapping("/user/{userId}")
+    public ShoppingCart getCartByUserId(@PathVariable int userId) {
+        return shoppingCartService.getShoppingCartByUserId(userId);
     }
 
-    @GetMapping("/{id}")
-    public ShoppingCart getShoppingCartById(@PathVariable int id) {
-        return shoppingCartService.getShoppingCartById(id);
-    }
-
-    @PostMapping
-    public ShoppingCart createShoppingCart(@RequestBody ShoppingCart shoppingCart) {
-        return shoppingCartService.saveShoppingCart(shoppingCart);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteShoppingCart(@PathVariable int id) {
-        shoppingCartService.deleteShoppingCart(id);
-    }
+//    @DeleteMapping("/clear/{userId}")
+//    public void clearCart(@PathVariable int userId) {
+//        shoppingCartService.clearCart(userId);
+//    }
 }
