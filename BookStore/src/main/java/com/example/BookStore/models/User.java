@@ -30,7 +30,7 @@ public class User {
     //password
 
     @Column(nullable = false)
-    private String role = "USER"; // Default role
+    private String role = "USER"; // Ensure this stores "USER" or "ADMIN"
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ShoppingCart shoppingCart;

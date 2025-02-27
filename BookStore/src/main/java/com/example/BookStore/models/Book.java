@@ -1,11 +1,12 @@
 package com.example.BookStore.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
-@Table (name = "Book")
+@Table(name = "Book")
 public class Book {
 
     @Id
@@ -26,6 +27,7 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference // Prevents infinite loop
     private Category category;
 
 }
