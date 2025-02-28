@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/order-items")
 public class OrderItemController {
@@ -29,8 +31,8 @@ public class OrderItemController {
         return orderItemService.saveOrderItem(orderItem);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteOrderItem(@PathVariable int id) {
-        orderItemService.deleteOrderItem(id);
-    }
+//    @DeleteMapping("/{id}")
+//    public void deleteOrderItem(@PathVariable int id) {
+//        orderItemService.deleteOrderItem(id);
+//    }
 }

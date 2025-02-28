@@ -12,6 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -25,17 +29,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:3000")); // Allow frontend
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Public access
-                        .requestMatchers(HttpMethod.GET, "/books/**").permitAll() // Anyone can view books
-                        .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN") // Only admin can create books
-                        .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN") // Only admin can delete books
-
-                        // Allow authenticated users to access shopping cart and cart items
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/books").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/books/**").hasRole("ADMIN")
                         .requestMatchers("/cart/**", "/cart-items/**").hasRole("USER")
-
-                        .anyRequest().authenticated() // Everything else needs authentication
+                        .requestMatchers(HttpMethod.POST, "/orders/checkout/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -53,4 +64,21 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // Allow frontend
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+        config.setExposedHeaders(List.of("Authorization"));
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
+
 }

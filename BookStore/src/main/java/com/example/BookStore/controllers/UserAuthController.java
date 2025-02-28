@@ -6,8 +6,11 @@ import com.example.BookStore.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 public class UserAuthController {
@@ -23,33 +26,40 @@ public class UserAuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody User user) {
+    public Map<String, String> registerUser(@RequestBody User user) {
+        Map<String, String> response = new HashMap<>();
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
 
         if (existingUser.isPresent()) {
-            return "Username already taken!";
+            response.put("message", "Username already taken!");
+            return response;
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
-
-        // Ensure roles are assigned properly
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getRole() == null || (!user.getRole().equalsIgnoreCase("ADMIN"))) {
-            user.setRole("USER"); // Default role
+            user.setRole("USER");
         }
 
         userRepository.save(user);
-        return "User registered successfully!";
+        response.put("message", "User registered successfully!");
+        return response;
     }
 
-
     @PostMapping("/login")
-    public String loginUser(@RequestBody User user) {
+    public Map<String, String> loginUser(@RequestBody User user) {
+        Map<String, String> response = new HashMap<>();
         Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
 
         if (foundUser.isPresent() && passwordEncoder.matches(user.getPassword(), foundUser.get().getPassword())) {
-            String token = jwtUtil.generateToken(foundUser.get().getUsername(), "ROLE_" + foundUser.get().getRole()); // Ensure ROLE_ADMIN
-            return "Bearer " + token; // Return token
+            User validUser = foundUser.get();
+            String token = jwtUtil.generateToken(validUser.getUsername(), "ROLE_" + validUser.getRole());
+
+            response.put("token", token);
+            response.put("userId", String.valueOf(validUser.getId())); // Include userId in the response
+            return response;
         }
-        return "Invalid credentials!";
+
+        response.put("message", "Invalid credentials!");
+        return response;
     }
 }
